@@ -8,8 +8,8 @@ class Bayes_Classifier:
       the system will proceed through training.  After running this method, the classifier
       is ready to classify input text.'''
 
-      self.positive = {}
-      self.negative = {}
+      self.positive = { "presence": 0, "frequency": {} }
+      self.negative = { "presence": 0, "frequency": {} }
 
       if os.path.isfile("positive.pickle") and os.path.isfile("negative.pickle"):
           self.positive = self.load("positive.pickle")
@@ -19,6 +19,7 @@ class Bayes_Classifier:
 
    def train(self):
       '''Trains the Naive Bayes Sentiment Classifier.'''
+
       iFileList = []
       path = "movies_reviews/movies_reviews"
 
@@ -35,13 +36,15 @@ class Bayes_Classifier:
           category = file.split('-')[1]
           contents = self.loadFile(path + '/' + file)
           words = self.tokenize(contents)
+          table = table_wrapper[category]
+
+          table["presence"] += 1
 
           for word in words:
-              table = table_wrapper[category]
-              if word in table:
-                  table[word] += 1
+              if word in table["frequency"]:
+                  table["frequency"][word] += 1
               else:
-                  table[word] = 1
+                  table["frequency"][word] = 1
 
       self.save(self.positive, "positive.pickle")
       self.save(self.negative, "negative.pickle")
@@ -51,6 +54,47 @@ class Bayes_Classifier:
       class to which the target string belongs. This function should return one of three
       strings: "positive", "negative" or "neutral".
       '''
+
+      total_documents = float(self.positive["presence"] + self.negative["presence"])
+      prior_probability = self.positive["presence"] / total_documents
+
+      sum_positive_features = float(sum(self.positive["frequency"].values()))
+      sum_negative_features = float(sum(self.negative["frequency"].values()))
+      words = self.tokenize(sText)
+
+
+      print self.positive["frequency"].values()
+
+      print sum_negative_features
+      print sum_positive_features
+
+
+      return
+
+      positive_probability = 0
+      for word in words:
+          freq = 1
+
+          if word in self.positive["frequency"]:
+              freq += self.positive["frequency"][word]
+
+          positive_probability += math.log(freq / sum_positive_features)
+
+      negative_probability = 0
+      for word in words:
+          freq = 1
+
+          if word in self.positive["frequency"]:
+              freq += self.positive["frequency"][word]
+
+          negative_probability += math.log(freq / sum_negative_features)
+
+
+
+
+      print "positive", positive_probability
+      print "negative", negative_probability
+
 
    def loadFile(self, sFilename):
       '''Given a file name, return the contents of the file as a string.'''
