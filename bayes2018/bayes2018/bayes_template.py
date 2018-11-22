@@ -21,7 +21,10 @@ class Bayes_Classifier:
       '''Trains the Naive Bayes Sentiment Classifier.'''
 
       iFileList = []
-      path = "movies_reviews/movies_reviews"
+
+      print "hello"
+      path = "movie_and_product_reviews/db_txt_files"
+      #path = "movies_reviews/movies_reviews"
 
       table_wrapper = {
          '1': self.negative,
@@ -32,8 +35,12 @@ class Bayes_Classifier:
           iFileList = iFileObj[2]
           break
 
+      print "ifileList", iFileList
+
       for file in iFileList:
           category = file.split('-')[1]
+          if category not in ["1", "5"]:
+              continue
           contents = self.loadFile(path + '/' + file)
           words = self.tokenize(contents)
           table = table_wrapper[category]
@@ -62,15 +69,6 @@ class Bayes_Classifier:
       sum_negative_features = float(sum(self.negative["frequency"].values()))
       words = self.tokenize(sText)
 
-
-      print self.positive["frequency"].values()
-
-      print sum_negative_features
-      print sum_positive_features
-
-
-      return
-
       positive_probability = 0
       for word in words:
           freq = 1
@@ -84,16 +82,18 @@ class Bayes_Classifier:
       for word in words:
           freq = 1
 
-          if word in self.positive["frequency"]:
-              freq += self.positive["frequency"][word]
+          if word in self.negative["frequency"]:
+              freq += self.negative["frequency"][word]
 
           negative_probability += math.log(freq / sum_negative_features)
 
-
-
-
       print "positive", positive_probability
       print "negative", negative_probability
+
+      if positive_probability > negative_probability:
+          return "positive"
+
+      return "negative"
 
 
    def loadFile(self, sFilename):
