@@ -1,7 +1,6 @@
 import math, os, pickle, re
 
 class Bayes_Classifier:
-   #TEST SYMLINK
    def __init__(self, trainDirectory = "movie_reviews/"):
       '''This method initializes and trains the Naive Bayes Sentiment Classifier.  If a
       cache of a trained classifier has been stored, it loads this cache.  Otherwise,
@@ -22,7 +21,6 @@ class Bayes_Classifier:
 
       iFileList = []
 
-      print "hello"
       path = "movie_and_product_reviews/db_txt_files"
       #path = "movies_reviews/movies_reviews"
 
@@ -34,8 +32,6 @@ class Bayes_Classifier:
       for iFileObj in os.walk(path):
           iFileList = iFileObj[2]
           break
-
-      print "ifileList", iFileList
 
       for file in iFileList:
           category = file.split('-')[1]
@@ -53,6 +49,7 @@ class Bayes_Classifier:
               else:
                   table["frequency"][word] = 1
 
+
       self.save(self.positive, "positive.pickle")
       self.save(self.negative, "negative.pickle")
 
@@ -62,37 +59,44 @@ class Bayes_Classifier:
       strings: "positive", "negative" or "neutral".
       '''
 
+      table_wrapper = {
+         "positive": self.positive,
+         "negative": self.negative
+      }
+
       total_documents = float(self.positive["presence"] + self.negative["presence"])
-      prior_probability = self.positive["presence"] / total_documents
-
-      sum_positive_features = float(sum(self.positive["frequency"].values()))
-      sum_negative_features = float(sum(self.negative["frequency"].values()))
-      words = self.tokenize(sText)
-
-      positive_probability = 0
-      for word in words:
-          freq = 1
-
-          if word in self.positive["frequency"]:
-              freq += self.positive["frequency"][word]
-
-          positive_probability += math.log(freq / sum_positive_features)
 
       negative_probability = 0
-      for word in words:
-          freq = 1
+      positive_probability = 0
 
-          if word in self.negative["frequency"]:
-              freq += self.negative["frequency"][word]
+      words = self.tokenize(sText)
 
-          negative_probability += math.log(freq / sum_negative_features)
+      for type in ["positive", "negative"]:
 
-      print "positive", positive_probability
-      print "negative", negative_probability
+          dict = table_wrapper[type]
+
+          prior_probability = math.log(dict["presence"] / total_documents)
+          sum_features = float(sum(dict["frequency"].values()))
+          probability = 0
+
+          for word in words:
+              freq = 1
+
+              if word in dict["frequency"]:
+                  freq += dict["frequency"][word]
+
+              probability += math.log(freq / sum_features)
+
+              if type == "positive":
+                  positive_probability = probability
+              else:
+                  negative_probability = probability
+
+      print "test_positive", positive_probability
+      print "test_negative", negative_probability
 
       if positive_probability > negative_probability:
-          return "positive"
-
+         return "positive"
       return "negative"
 
 
