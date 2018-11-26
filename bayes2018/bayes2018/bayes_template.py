@@ -74,18 +74,19 @@ class Bayes_Classifier:
       for type in ["positive", "negative"]:
 
           dict = table_wrapper[type]
+          len_vocab = len(dict["frequency"].keys())
 
-          prior_probability = math.log(dict["presence"] / total_documents)
-          sum_features = float(sum(dict["frequency"].values()))
-          probability = 0
+          sum_features = sum(dict["frequency"].values())
+          probability = math.log(dict["presence"] / total_documents)
 
           for word in words:
-              freq = 1
+              freq = 1.0
 
               if word in dict["frequency"]:
+                  print "HELLO", type, dict["frequency"][word]
                   freq += dict["frequency"][word]
 
-              probability += math.log(freq / sum_features)
+              probability += math.log(freq / (sum_features + len_vocab))
 
               if type == "positive":
                   positive_probability = probability
@@ -95,10 +96,14 @@ class Bayes_Classifier:
       print "test_positive", positive_probability
       print "test_negative", negative_probability
 
-      if positive_probability > negative_probability:
-         return "positive"
-      return "negative"
+      print abs(positive_probability - negative_probability)
 
+      if abs(positive_probability - negative_probability) <= 0.5:
+          return "neutral"
+      elif positive_probability > negative_probability:
+          return "positive"
+      else:
+          return "negative"
 
    def loadFile(self, sFilename):
       '''Given a file name, return the contents of the file as a string.'''

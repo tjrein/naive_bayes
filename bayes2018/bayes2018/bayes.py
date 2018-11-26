@@ -65,6 +65,7 @@ class Bayes_Classifier:
       }
 
       total_documents = float(self.positive["presence"] + self.negative["presence"])
+      len_vocab = len(self.positive["frequency"].keys()) + len(self.negative["frequency"].keys())
 
       negative_probability = 0
       positive_probability = 0
@@ -74,8 +75,6 @@ class Bayes_Classifier:
       for type in ["positive", "negative"]:
 
           dict = table_wrapper[type]
-          len_vocab = len(dict["frequency"].keys())
-
           sum_features = sum(dict["frequency"].values())
           probability = math.log(dict["presence"] / total_documents)
 
@@ -83,20 +82,14 @@ class Bayes_Classifier:
               freq = 1.0
 
               if word in dict["frequency"]:
-                  print "HELLO", type, dict["frequency"][word]
                   freq += dict["frequency"][word]
 
               probability += math.log(freq / (sum_features + len_vocab))
 
-              if type == "positive":
-                  positive_probability = probability
-              else:
-                  negative_probability = probability
-
-      print "test_positive", positive_probability
-      print "test_negative", negative_probability
-
-      print abs(positive_probability - negative_probability)
+          if type == "positive":
+              positive_probability = probability
+          else:
+              negative_probability = probability
 
       if abs(positive_probability - negative_probability) <= 0.5:
           return "neutral"
