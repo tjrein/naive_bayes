@@ -1,7 +1,7 @@
 import math, os, pickle, re, string
 
 class Bayes_Classifier:
-    def __init__(self, trainDirectory = "movie_reviews/"):
+    def __init__(self, trainDirectory = "reviews/"):
         '''This method initializes and trains the Naive Bayes Sentiment Classifier.  If a
         cache of a trained classifier has been stored, it loads this cache.  Otherwise,
         the system will proceed through training.  After running this method, the classifier
@@ -14,35 +14,37 @@ class Bayes_Classifier:
             self.positive = self.load("positive_best.pickle")
             self.negative = self.load("negative_best.pickle")
         else:
-            self.train()
+            self.train(trainDirectory)
 
-    def train(self):
+    def train(self, trainDirectory):
         '''Trains the Naive Bayes Sentiment Classifier.'''
 
         iFileList = []
-        path = "movie_and_product_reviews/db_txt_files"
-        #path = "movies_reviews/movies_reviews"
 
+        #accesses appropriate attribute depending on category
         table_wrapper = {
            '1': self.negative,
            '5': self.positive
         }
 
-        for iFileObj in os.walk(path):
+        for iFileObj in os.walk(trainDirectory):
             iFileList = iFileObj[2]
             break
 
         for file in iFileList:
             category = file.split('-')[1]
+
+            #exclude files that are not positive or negative
             if category not in ["1", "5"]:
                 continue
-            contents = self.loadFile(path + '/' + file)
-            contents = ''.join(c for c in contents if c not in string.punctuation)
-            words = self.tokenize(contents.lower())
-            #filtered_words = [ word for word in words if word not in stop_words ]
+
+            contents = self.loadFile(trainDirectory + file)
+
+            #strip punctuation and apply lowercase
+            sanitized = ''.join(c for c in contents if c not in string.punctuation).lower()
+            words = self.tokenize(sanitized)
 
             table = table_wrapper[category]
-
             table["presence"] += 1
 
             for i, word in enumerate(words):
@@ -51,6 +53,7 @@ class Bayes_Classifier:
                 else:
                     table["frequency"][word] = 1
 
+                #determine bigrams and store in seperate dict
                 if i <= len(words) - 1:
                     bigram = ' '.join(words[i:i+2])
                     if bigram in table["bigrams"]:
@@ -75,18 +78,19 @@ class Bayes_Classifier:
         total_documents = float(self.positive["presence"] + self.negative["presence"])
         len_vocab = len(self.positive["frequency"].keys()) + len(self.negative["frequency"].keys())
 
-
         negative_probability = 0
         positive_probability = 0
 
-        sText = ''.join(c for c in sText if c not in string.punctuation)
-        words = self.tokenize(sText.lower())
+        #strip punctuation and lowercase everything
+        sanitized = ''.join(c for c in sText if c not in string.punctuation).lower()
+        words = self.tokenize(sanitized)
 
         for type in ["positive", "negative"]:
 
             dict = table_wrapper[type]
             sum_features = sum(dict["frequency"].values())
             probability = math.log(dict["presence"] / total_documents)
+            test_freq = 1.0
 
             for i in range(1, len(words)):
                 freq = 1.0
@@ -96,6 +100,7 @@ class Bayes_Classifier:
                 if bigram in dict["bigrams"]:
                     freq += dict["bigrams"][bigram]
 
+                #get count of first word in bigram in frequency table
                 count = 0
                 if words[i-1] in dict["frequency"]:
                     count += dict["frequency"][words[i-1]]
