@@ -12,7 +12,7 @@
         - Normalizes data striping punctuation and applying lowercase
         - imports the native string module as an added dependency
 
-    * evaluation.pdf
+    * evaluation_doc.pdf
         - Contains answers to reflection questions
         - Outlines steps taken to improve classifier
         - Compares both classifiers using precision, recall, and f- measure
