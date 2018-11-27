@@ -50,7 +50,6 @@ class Bayes_Classifier:
                 else:
                     table["frequency"][word] = 1
 
-
         self.save(self.positive, "positive.pickle")
         self.save(self.negative, "negative.pickle")
 
