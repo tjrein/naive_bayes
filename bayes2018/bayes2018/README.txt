@@ -16,7 +16,7 @@
         - Contains answers to reflection questions
         - Outlines steps taken to improve classifier
         - Compares both classifiers using precision, recall, and f- measure
-        - Offers several future avenues to potentially extend performance
+        - Offers several future ways to potentially extend performance
 
     * evaluate.py
         - executable file used to train and test classifiers
@@ -35,11 +35,12 @@
 
     * Training data
 
-        Training data can be sent to a classifier on init by passing in folder as an argument.
+        Training data can be sent to a classifier on init by passing in a folder as an argument.
             ex. b = bayes.Bayes_Classifier("training/")
 
-        This classifier will walk through the files contained in "training/", train the system by way of frequency tables, and pickle the result.
-        If no folder is passed as an argument, a default value of "reviews/" will be assigned
+        This classifier will walk through the files contained in "training/", train the system, and pickle the resulting dicts.
+        If no folder is passed as an argument, a default value of "reviews/" will be assigned.
+        Note that a trailing slash is expected.
 
         With respect to evaluate.py, this can be further configured by modifying the value of the variable TrainDir.
         evaluate.py will initialize the classifier with whatever value is stored in TrainDir
@@ -54,6 +55,12 @@
 
 ==== Usage Instructions ====
 
-    * Commands To train and test classifiers:
+    * Commands To train and test classifiers using evaluate.py:
        - "python evaluate.py"
        - "python evaluate.py [nameOfTestFolder]"
+
+    * Usage in a python shell:
+       >>> import bayesbest.py
+       >>> b = bayesbest.Bayes_Classifier("myTrainingFiles/")
+       >>> result = b.classify("I love my AI class")
+       >>> print result
