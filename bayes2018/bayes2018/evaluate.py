@@ -1,6 +1,6 @@
 import sys
 
-testFile = "bayesbest.py"
+testFile = "bayes.py"
 trainDir = "training/"
 testDir = "testing/"
 

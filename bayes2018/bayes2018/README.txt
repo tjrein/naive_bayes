@@ -48,6 +48,7 @@
     * Changing classifiers in evaluate.py
         Determining which classifier to initialize will depend on the value of the variable testFile.
         This value will need to be updated manually to either be "bayes.py" or "bayesbest.py" to test the respective classifier.
+        The initial value is set to "bayes.py"
 
     * Test data
         evaluate.py has been modified to accept an optional command line argument.
@@ -58,6 +59,9 @@
     * Commands To train and test classifiers using evaluate.py:
        - "python evaluate.py"
        - "python evaluate.py [nameOfTestFolder]"
+
+       The first command will use the value of "trainDir" as training data
+       The second command will replace the value of "trainDir" with [nameOfTestFolder] and use the new folder to train
 
     * Usage in a python shell:
        >>> import bayesbest.py
